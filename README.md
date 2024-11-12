@@ -24,7 +24,7 @@ To run the application on your local machine:
 1. Clone or download this repository to your computer.
    ```bash
    git clone https://github.com/EnContacto/L5-GoWebApp.git
-   cd L5-GoWebApp.git
+   cd L5-GoWebApp
 2. Open a terminal in the root directory of the project.
 3. Start app with:
    ```bash
