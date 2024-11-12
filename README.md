@@ -43,5 +43,5 @@ You can also run this application using Docker for a containerized environment.
 The application should now be accessible at `http://localhost:5000` in your web browser.
 
 ## Troubleshooting
-Ensure Docker is installed and running correctly if using the Docker setup.
-Make sure no other application is using port `5000` before running the server.
+  - Ensure Docker is installed and running correctly if using the Docker setup.
+  - Make sure no other application is using port `5000` before running the server.
