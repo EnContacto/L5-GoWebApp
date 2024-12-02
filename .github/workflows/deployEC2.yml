@@ -30,13 +30,13 @@ jobs:
 
     - name: Deploy to EC2
       env:
-        AWS_PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY }}
-        EC2_HOST: ${{ secrets.EC2_HOST }}
+          AWS_PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
       run: |
-        echo "${AWS_PRIVATE_KEY}" > private_key.pem
-        chmod 600 private_key.pem
-        scp -o StrictHostKeyChecking=no -i private_key.pem app ubuntu@$EC2_HOST:/home/ubuntu/app
-        ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@$EC2_HOST << 'EOF'
-        pkill app || true
-        nohup /home/ubuntu/app > app.log 2>&1 &
-        EOF
+          echo "${AWS_PRIVATE_KEY}" > private_key.pem
+          chmod 600 private_key.pem   # Asegúrate de que la clave tenga permisos correctos
+          scp -o StrictHostKeyChecking=no -i private_key.pem app ec2-user@$EC2_HOST:/home/ec2-user/app
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@$EC2_HOST << 'EOF'
+          pkill app || true
+          nohup /home/ec2-user/app > app.log 2>&1 &
+          EOF
