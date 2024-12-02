@@ -30,7 +30,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	greeting += fmt.Sprintf("Mondays passed since the beginning of the year: %d.", mondaysPassed)
+	greeting += fmt.Sprintf("Hello this is a little Test with Action so... Mondays passed since the beginning of the year: %d.", mondaysPassed)
 
 	// Output the result as HTML
 	fmt.Fprintf(w, "<html><head><title>Greeting Page</title></head><body>%s</body></html>", greeting)
