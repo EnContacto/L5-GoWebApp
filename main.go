@@ -11,7 +11,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 
 	// Greeting message
-	greeting := fmt.Sprintf("Hello, the current time is %s.<br>", now.Format("15:04"))
+	greeting := fmt.Sprintf("Hello this is a second test, the current time is %s.<br>", now.Format("15:04"))
 
 	// Hours passed today
 	hoursPassedToday := float64(now.Hour()) + float64(now.Minute())/60
