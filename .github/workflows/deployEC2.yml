@@ -1,4 +1,4 @@
-name: Deploy Go App to EC2
+name: Deploy Go App
 
 on:
   push:
@@ -6,31 +6,32 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up Go
+    - name: Setup Go
       uses: actions/setup-go@v4
       with:
-        go-version: 1.20
+        go-version: '1.20'
 
-    - name: Build Go application
-      run: go build -o app main.go
+    - name: Install build tools
+      run: sudo apt-get install -y build-essential gcc
+
+    - name: Build the application
+      run: |
+        export CGO_ENABLED=0
+        go build -ldflags="-extldflags=-static" -o app main.go
 
     - name: Deploy to EC2
       env:
         AWS_PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY }}
-        EC2_USER: ubuntu
-        EC2_HOST: <EC2_INSTANCE_IP>
+        EC2_HOST: ${{ secrets.EC2_HOST }}
       run: |
         echo "${AWS_PRIVATE_KEY}" > private_key.pem
         chmod 600 private_key.pem
-        scp -o StrictHostKeyChecking=no -i private_key.pem app $EC2_USER@$EC2_HOST:/home/ubuntu/app
-        ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << 'EOF'
-        pkill app || true
-        nohup /home/ubuntu/app > /home/ubuntu/app.log 2>&1 &
-        EOF
+        scp -i private_key.pem app ubuntu@$EC2_HOST:/home/ubuntu/app
+        ssh -i private_key.pem ubuntu@$EC2_HOST 'pkill app || true && nohup /home/ubuntu/app > app.log 2>&1 &'
