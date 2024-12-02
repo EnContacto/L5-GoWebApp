@@ -34,9 +34,11 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_HOST }}
       run: |
           echo "${AWS_PRIVATE_KEY}" > private_key.pem
-          chmod 600 private_key.pem   # Asegúrate de que la clave tenga permisos correctos
+          chmod 600 private_key.pem   
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@$EC2_HOST << 'EOF'
+          pkill app || true  # Detiene la aplicación en caso de que esté corriendo
+          EOF
           scp -o StrictHostKeyChecking=no -i private_key.pem app ec2-user@$EC2_HOST:/home/ec2-user/app
           ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@$EC2_HOST << 'EOF'
-          pkill app || true
-          nohup /home/ec2-user/app > app.log 2>&1 &
+          nohup /home/ec2-user/app > app.log 2>&1 &  
           EOF
