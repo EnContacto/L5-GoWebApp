@@ -18,13 +18,15 @@ jobs:
       with:
         go-version: '1.20'
 
-    - name: Install build tools
-      run: sudo apt-get install -y build-essential gcc
-
     - name: Build the application
       run: |
         export CGO_ENABLED=0
         go build -ldflags="-extldflags=-static" -o app main.go
+
+    - name: Add EC2 Host to known_hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
     - name: Deploy to EC2
       env:
@@ -33,5 +35,8 @@ jobs:
       run: |
         echo "${AWS_PRIVATE_KEY}" > private_key.pem
         chmod 600 private_key.pem
-        scp -i private_key.pem app ubuntu@$EC2_HOST:/home/ubuntu/app
-        ssh -i private_key.pem ubuntu@$EC2_HOST 'pkill app || true && nohup /home/ubuntu/app > app.log 2>&1 &'
+        scp -o StrictHostKeyChecking=no -i private_key.pem app ubuntu@$EC2_HOST:/home/ubuntu/app
+        ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@$EC2_HOST << 'EOF'
+        pkill app || true
+        nohup /home/ubuntu/app > app.log 2>&1 &
+        EOF
